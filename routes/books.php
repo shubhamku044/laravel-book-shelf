@@ -7,3 +7,7 @@ Route::get('/books', [BookController::class, 'index'])->name('books.index');
 Route::post('/books', [BookController::class, 'store'])->name('books.store');
 Route::patch('/books/{id}', [BookController::class, 'update'])->name('books.update');
 Route::delete('/books/{id}', [BookController::class, 'destroy'])->name('books.destroy');
+Route::post('/books/download/{format}', [BookController::class, 'download'])
+    ->where('format', 'csv|xml');
+Route::post('/books/bulk', [BookController::class, 'bulkStore']);
+Route::delete('/books/purge', [BookController::class, 'purge']);
