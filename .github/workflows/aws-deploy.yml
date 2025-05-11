@@ -25,6 +25,29 @@ jobs:
 
       - name: Build Docker images
         run: |
-          docker compose build --progress=plain app
-          docker tag laravel-book-shelf-app:latest ${{ secrets.AWS_ECR_REPO_URI }}:latest
-          # docker push ${{ secrets.AWS_ECR_REPO_URI }}:latest
+          # Build the app service with --no-cache to ensure fresh build
+          docker compose build --progress=plain --no-cache app
+          
+          # Get the image ID from the built image
+          IMAGE_ID=$(docker images -q laravel-book-shelf-app:latest)
+          
+          # Tag with both latest and commit hash
+          docker tag $IMAGE_ID ${{ secrets.AWS_ECR_REPO_URI }}:latest
+          docker tag $IMAGE_ID ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
+
+      - name: Push to Amazon ECR
+        run: |
+          # Push both tags to ECR
+          docker push ${{ secrets.AWS_ECR_REPO_URI }}:latest
+          docker push ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
+
+      - name: Deploy to AWS ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ secrets.AWS_ECS_TASK_DEFINITION }}
+          service: ${{ secrets.AWS_ECS_SERVICE }}
+          cluster: ${{ secrets.AWS_ECS_CLUSTER }}
+          container-name: laravel-bookshelf-container
+          image-tag: ${{ github.sha }}
+          wait-for-service-stability: true
+          wait-for-minutes: 15
