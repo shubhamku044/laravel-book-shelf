@@ -29,7 +29,7 @@ jobs:
 
           IMAGE_ID=$(docker images -q app:latest)
 
-          # docker tag $IMAGE_ID ${{ secrets.AWS_ECR_REPO_URI }}:latest
+          docker tag $IMAGE_ID ${{ secrets.AWS_ECR_REPO_URI }}:latest
           # docker tag $IMAGE_ID ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
           # docker push ${{ secrets.AWS_ECR_REPO_URI }}:latest
           # docker push ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
