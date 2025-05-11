@@ -19,14 +19,22 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Build Docker images
-        run: |
-          docker compose build
-          docker compose push
-
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and Tag Docker images
+        run: |
+          # Build the app service
+          docker compose build app
+          
+          # Tag the image
+          docker tag app:latest ${{ secrets.AWS_ECR_REPO_URI }}:latest
+          docker tag app:latest ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
+          
+          # Push to ECR
+          docker push ${{ secrets.AWS_ECR_REPO_URI }}:latest
+          docker push ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
 
       - name: Build Docker images
         run: |
