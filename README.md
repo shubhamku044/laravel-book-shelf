@@ -18,6 +18,38 @@ A modern web application built with Laravel, React, and Inertia.js for managing 
 - Node.js 21.x (for local development)
 - PHP 8.2+ (for local development)
 - Composer (for local development)
+- AWS CLI (for AWS deployment)
+- GitHub Actions (for CI/CD)
+
+## AWS Deployment
+
+To deploy the application to AWS, you need to:
+
+1. Set up an AWS account and create an ECS cluster
+2. Create an ECR repository for your Docker images
+3. Add the following secrets to your GitHub repository:
+   - `AWS_ACCESS_KEY_ID` - Your AWS access key
+   - `AWS_SECRET_ACCESS_KEY` - Your AWS secret key
+   - `AWS_REGION` - Your AWS region (e.g., us-east-1)
+   - `AWS_ECS_CLUSTER` - Your ECS cluster name
+   - `AWS_ECS_SERVICE` - Your ECS service name
+   - `AWS_ECS_TASK_DEFINITION` - Your ECS task definition
+   - `AWS_ECS_CONTAINER_NAME` - Your ECS container name
+   - `SLACK_WEBHOOK_URL` (optional) - For Slack notifications
+   - `SLACK_CHANNEL` (optional) - For Slack notifications
+
+The deployment pipeline will automatically:
+- Build and push Docker images to ECR
+- Deploy to ECS
+- Send notifications to Slack (if configured)
+
+## Prerequisites
+
+- Docker and Docker Compose
+- Git
+- Node.js 21.x (for local development)
+- PHP 8.2+ (for local development)
+- Composer (for local development)
 
 ## Local Development Setup
 
