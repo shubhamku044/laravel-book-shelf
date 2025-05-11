@@ -147,7 +147,7 @@ export default function Welcome() {
     };
     const handlePageChange = (page: number) => {
         if (searchQuery) {
-            searchBooks(searchQuery, page, perPage, sortBy, sortOrder);
+            searchBooks(searchQuery.trim(), page, perPage, sortBy, sortOrder);
         } else {
             fetchBooks(page, perPage, sortBy, sortOrder);
         }
@@ -168,7 +168,7 @@ export default function Welcome() {
         setSortBy(newColumn);
         setSortOrder(newOrder);
         if (searchQuery) {
-            searchBooks(searchQuery, 1, perPage, newColumn, newOrder);
+            searchBooks(searchQuery.trim(), 1, perPage, newColumn, newOrder);
         } else {
             fetchBooks(1, perPage, newColumn, newOrder);
         }
@@ -178,7 +178,7 @@ export default function Welcome() {
         setPerPage(newPerPage);
 
         if (searchQuery) {
-            searchBooks(searchQuery, 1, newPerPage, sortBy, sortOrder);
+            searchBooks(searchQuery.trim(), 1, newPerPage, sortBy, sortOrder);
         } else {
             fetchBooks(1, newPerPage, sortBy, sortOrder);
         }
@@ -212,7 +212,7 @@ export default function Welcome() {
 
     useEffect(() => {
         if (debouncedSearchQuery.trim().length) {
-            searchBooks(debouncedSearchQuery, 1, perPage, sortBy, sortOrder);
+            searchBooks(debouncedSearchQuery.trim(), 1, perPage, sortBy, sortOrder);
         } else if (debouncedSearchQuery === '') {
             fetchBooks(1, perPage, sortBy, sortOrder);
         }
@@ -279,11 +279,11 @@ export default function Welcome() {
                         </div>
 
                         <div className="mb-2 flex items-center justify-between">
-                            <h2 className="text-xl font-semibold">{searchQuery ? `Search results for "${searchQuery}"` : 'Books'}</h2>
+                            <h2 className="text-xl font-semibold">{searchQuery.trim() ? `Search results for "${searchQuery.trim()}"` : 'Books'}</h2>
                         </div>
                         <Table>
                             <TableCaption>
-                                {isSearching ? 'Searching...' : searchQuery ? `Found ${meta.total} results for "${searchQuery}"` : 'List of Books'}
+                                {isSearching ? 'Searching...' : searchQuery.trim() ? `Found ${meta.total} results for "${searchQuery.trim()}"` : 'List of Books'}
                             </TableCaption>
                             <TableHeader>
                                 <TableRow>
@@ -330,7 +330,7 @@ export default function Welcome() {
                                         <TableCell colSpan={3} className="py-8 text-center">
                                             {isSearching
                                                 ? 'Searching...'
-                                                : searchQuery
+                                                : searchQuery.trim()
                                                   ? 'No books found matching your search.'
                                                   : 'No books available.'}
                                         </TableCell>
@@ -341,15 +341,15 @@ export default function Welcome() {
                                         return (
                                             <TableRow key={id}>
                                                 <TableCell className="max-w-[350px] truncate font-medium">
-                                                    {searchQuery ? (
-                                                        <span dangerouslySetInnerHTML={{ __html: highlightSearchTerm(title, searchQuery) }} />
+                                                    {searchQuery.trim() ? (
+                                                        <span dangerouslySetInnerHTML={{ __html: highlightSearchTerm(title, searchQuery.trimStart()) }} />
                                                     ) : (
                                                         title
                                                     )}
                                                 </TableCell>
                                                 <TableCell className="max-w-[350px] truncate">
                                                     {searchQuery ? (
-                                                        <span dangerouslySetInnerHTML={{ __html: highlightSearchTerm(author, searchQuery) }} />
+                                                        <span dangerouslySetInnerHTML={{ __html: highlightSearchTerm(author, searchQuery.trimStart()) }} />
                                                     ) : (
                                                         author
                                                     )}
