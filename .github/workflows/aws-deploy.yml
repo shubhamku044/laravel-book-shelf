@@ -42,13 +42,20 @@ jobs:
           docker push ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
 
       - name: Deploy to AWS ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ secrets.AWS_ECS_TASK_DEFINITION }}
-          service: ${{ secrets.AWS_ECS_SERVICE }}
-          cluster: ${{ secrets.AWS_ECS_CLUSTER }}
-          wait-for-service-stability: true
-          wait-for-minutes: 15
-        env:
-          AWS_ECR_REPO_URI: ${{ secrets.AWS_ECR_REPO_URI }}
-          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          # Update ECS task definition with new image
+          aws ecs register-task-definition \
+            --family ${{ secrets.AWS_ECS_TASK_DEFINITION }} \
+            --network-configuration 'awsvpcConfiguration={subnets=[subnet-123456],securityGroups=[sg-123456],assignPublicIp=ENABLED}' \
+            --container-definitions '[{"name":"laravel-bookshelf-container","image":"${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}","essential":true,"portMappings":[{"containerPort":8080,"hostPort":8080,"protocol":"tcp"}]}'
+          
+          # Update ECS service
+          aws ecs update-service \
+            --cluster ${{ secrets.AWS_ECS_CLUSTER }} \
+            --service ${{ secrets.AWS_ECS_SERVICE }} \
+            --task-definition ${{ secrets.AWS_ECS_TASK_DEFINITION }}
+          
+          # Wait for deployment
+          aws ecs wait services-stable \
+            --cluster ${{ secrets.AWS_ECS_CLUSTER }} \
+            --services ${{ secrets.AWS_ECS_SERVICE }}
