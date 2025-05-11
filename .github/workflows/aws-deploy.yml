@@ -27,10 +27,10 @@ jobs:
         run: |
           # Build the app service with --no-cache to ensure fresh build
           docker compose build --progress=plain --no-cache app
-          
+
           # Get the image ID from the built image
           IMAGE_ID=$(docker images -q laravel-book-shelf-app:latest)
-          
+
           # Tag with both latest and commit hash
           docker tag $IMAGE_ID ${{ secrets.AWS_ECR_REPO_URI }}:latest
           docker tag $IMAGE_ID ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
@@ -43,19 +43,8 @@ jobs:
 
       - name: Deploy to AWS ECS
         run: |
-          # Update ECS task definition with new image
-          aws ecs register-task-definition \
-            --family ${{ secrets.AWS_ECS_TASK_DEFINITION }} \
-            --network-configuration 'awsvpcConfiguration={subnets=[subnet-123456],securityGroups=[sg-123456],assignPublicIp=ENABLED}' \
-            --container-definitions '[{"name":"laravel-bookshelf-container","image":"${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}","essential":true,"portMappings":[{"containerPort":8080,"hostPort":8080,"protocol":"tcp"}]}'
-          
-          # Update ECS service
           aws ecs update-service \
             --cluster ${{ secrets.AWS_ECS_CLUSTER }} \
             --service ${{ secrets.AWS_ECS_SERVICE }} \
-            --task-definition ${{ secrets.AWS_ECS_TASK_DEFINITION }}
-          
-          # Wait for deployment
-          aws ecs wait services-stable \
-            --cluster ${{ secrets.AWS_ECS_CLUSTER }} \
-            --services ${{ secrets.AWS_ECS_SERVICE }}
+            --force-new-deployment \
+            --region ${{ secrets.AWS_REGION }}
