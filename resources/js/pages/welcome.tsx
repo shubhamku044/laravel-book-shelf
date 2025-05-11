@@ -1,12 +1,12 @@
+import { AddBookModal, DeleteBookConfirmation, DownloadBooksModal } from '@/components';
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { Button, Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { BookSortBy, BookSortOrder } from '@/types';
 import { Book, PaginationMeta } from '@/types/api';
 import { Head } from '@inertiajs/react';
-import { useCallback, useEffect, useState } from 'react';
 import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon, PencilIcon } from 'lucide-react';
-import { BookSortBy, BookSortOrder } from '@/types';
-import { DeleteBookConfirmation, AddBookModal } from '@/components';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function Welcome() {
     const [books, setBooks] = useState<Book[]>([]);
@@ -118,8 +118,9 @@ export default function Welcome() {
                     <div className="mx-auto max-w-3xl">
                         <div className="mb-4 flex flex-col gap-4">
                             <div className="flex justify-between">
-                                <div>
+                                <div className="flex gap-2">
                                     <AddBookModal onBookAdded={() => fetchBooks()} />
+                                    <DownloadBooksModal />
                                 </div>
                                 <div className="flex items-center space-x-2">
                                     <span className="text-sm">Items per page:</span>
@@ -142,7 +143,10 @@ export default function Welcome() {
                             <TableCaption>List of Books</TableCaption>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="hover:bg-accent/50 w-[350px] cursor-pointer" onClick={() => handleSortChange(BookSortBy.TITLE)}>
+                                    <TableHead
+                                        className="hover:bg-accent/50 w-[350px] cursor-pointer"
+                                        onClick={() => handleSortChange(BookSortBy.TITLE)}
+                                    >
                                         <div className="flex items-center space-x-1">
                                             <span>Title</span>
                                             {sortBy === 'title' ? (
@@ -156,7 +160,10 @@ export default function Welcome() {
                                             )}
                                         </div>
                                     </TableHead>
-                                    <TableHead className="hover:bg-accent/50 w-[350px] cursor-pointer" onClick={() => handleSortChange(BookSortBy.AUTHOR)}>
+                                    <TableHead
+                                        className="hover:bg-accent/50 w-[350px] cursor-pointer"
+                                        onClick={() => handleSortChange(BookSortBy.AUTHOR)}
+                                    >
                                         <div className="flex items-center space-x-1">
                                             <span>Author</span>
                                             {sortBy === 'author' ? (
@@ -177,37 +184,29 @@ export default function Welcome() {
                                 {books.map((book) => {
                                     const { title, author, id } = book;
                                     return (
-                                            <TableRow key={id}>
-                                                <TableCell className="max-w-[350px] truncate font-medium">
-                                                    {title}
-                                                </TableCell>
-                                                <TableCell className="max-w-[350px] truncate">
-                                                    {author}
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    <div className="flex justify-end space-x-1">
-                                                        <AddBookModal
-                                                            book={book}
-                                                            isEditMode={true}
-                                                            onBookUpdated={() =>
-fetchBooks(meta.current_page, perPage, sortBy, sortOrder)
-                                                            }
-                                                            triggerButton={
-                                                                <Button size="icon" variant="ghost" className="h-8 w-8">
-                                                                    <PencilIcon className="h-4 w-4" />
-                                                                </Button>
-                                                            }
-                                                        />
-                                                        <DeleteBookConfirmation
-                                                            bookId={id}
-                                                            bookTitle={title}
-                                                            onBookDeleted={() =>
-fetchBooks(meta.current_page, perPage, sortBy, sortOrder)
-                                                            }
-                                                        />
-                                                    </div>
-                                                </TableCell>
-                                            </TableRow>
+                                        <TableRow key={id}>
+                                            <TableCell className="max-w-[350px] truncate font-medium">{title}</TableCell>
+                                            <TableCell className="max-w-[350px] truncate">{author}</TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex justify-end space-x-1">
+                                                    <AddBookModal
+                                                        book={book}
+                                                        isEditMode={true}
+                                                        onBookUpdated={() => fetchBooks(meta.current_page, perPage, sortBy, sortOrder)}
+                                                        triggerButton={
+                                                            <Button size="icon" variant="ghost" className="h-8 w-8">
+                                                                <PencilIcon className="h-4 w-4" />
+                                                            </Button>
+                                                        }
+                                                    />
+                                                    <DeleteBookConfirmation
+                                                        bookId={id}
+                                                        bookTitle={title}
+                                                        onBookDeleted={() => fetchBooks(meta.current_page, perPage, sortBy, sortOrder)}
+                                                    />
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
                                     );
                                 })}
                             </TableBody>

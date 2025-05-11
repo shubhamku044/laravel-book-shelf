@@ -1,7 +1,5 @@
-import DeleteBookConfirmation from "./delete-book-confirmation";
-import AddBookModal from "./add-book-modal";
+import AddBookModal from './add-book-modal';
+import DeleteBookConfirmation from './delete-book-confirmation';
+import DownloadBooksModal from './download-books-modal';
 
-export {
-    DeleteBookConfirmation,
-    AddBookModal
-}
+export { AddBookModal, DeleteBookConfirmation, DownloadBooksModal };
