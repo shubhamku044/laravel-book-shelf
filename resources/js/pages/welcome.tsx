@@ -1,5 +1,6 @@
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { Button, Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Book, PaginationMeta } from '@/types/api';
 import { Head } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
@@ -18,6 +19,8 @@ export default function Welcome() {
     const [sortBy, setSortBy] = useState<string>('created_at');
     const [sortOrder, setSortOrder] = useState<string>('desc');
     const [perPage, setPerPage] = useState<number>(5);
+
+    const perPageOptions = [5, 10, 20, 50, 100];
 
     const fetchBooks = useCallback(
         (page: number = 1, itemsPerPage: number = perPage, sortColumn: string = sortBy, sortDirection: string = sortOrder) => {
@@ -58,6 +61,12 @@ export default function Welcome() {
     const handlePageChange = (page: number) => {
         fetchBooks(page, perPage, sortBy, sortOrder);
     };
+    const handlePerPageChange = (value: string) => {
+        const newPerPage = parseInt(value);
+        setPerPage(newPerPage);
+        fetchBooks(1, newPerPage, sortBy, sortOrder);
+    };
+
     useEffect(() => {
         const url = new URL(window.location.href);
         const urlPerPage = url.searchParams.get('per_page');
@@ -88,6 +97,25 @@ export default function Welcome() {
                 </header>
                 <main className="w-full dark:text-white">
                     <div className="mx-auto max-w-3xl">
+                        <div>
+                            <div>
+                                <div className="flex items-center space-x-2">
+                                    <span className="text-sm">Items per page:</span>
+                                    <Select value={perPage.toString()} onValueChange={handlePerPageChange}>
+                                        <SelectTrigger className="w-[80px]">
+                                            <SelectValue placeholder="5" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {perPageOptions.map((option) => (
+                                                <SelectItem key={option} value={option.toString()}>
+                                                    {option}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                        </div>
                         <Table>
                             <TableCaption>List of Books</TableCaption>
                             <TableHeader>
