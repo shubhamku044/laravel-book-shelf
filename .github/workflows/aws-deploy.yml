@@ -27,29 +27,12 @@ jobs:
         run: |
           # Build the image with the correct tag
           docker compose build --progress=plain app
-          
+
           # Get the image ID
           IMAGE_ID=$(docker images -q app:latest)
-          
+
           # Tag and push to ECR
           docker tag $IMAGE_ID ${{ secrets.AWS_ECR_REPO_URI }}:latest
           docker tag $IMAGE_ID ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
           docker push ${{ secrets.AWS_ECR_REPO_URI }}:latest
           docker push ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
-
-      - name: Build Docker images
-        run: |
-          docker compose build
-          docker tag app:latest ${{ secrets.AWS_ECR_REPO_URI }}:latest
-          docker tag app:latest ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
-          docker push ${{ secrets.AWS_ECR_REPO_URI }}:latest
-          docker push ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
-
-      - name: Deploy to AWS ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ secrets.AWS_ECS_TASK_DEFINITION }}
-          service: ${{ secrets.AWS_ECS_SERVICE }}
-          cluster: ${{ secrets.AWS_ECS_CLUSTER }}
-          wait-for-service-stability: true
-          wait-for-minutes: 15
