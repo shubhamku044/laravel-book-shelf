@@ -211,7 +211,7 @@ export default function Welcome() {
     }, []);
 
     useEffect(() => {
-        if (debouncedSearchQuery) {
+        if (debouncedSearchQuery.trim().length) {
             searchBooks(debouncedSearchQuery, 1, perPage, sortBy, sortOrder);
         } else if (debouncedSearchQuery === '') {
             fetchBooks(1, perPage, sortBy, sortOrder);
