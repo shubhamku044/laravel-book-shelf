@@ -4,6 +4,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Book, PaginationMeta } from '@/types/api';
 import { Head } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
+import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon, PencilIcon } from 'lucide-react';
+import { BookSortBy, BookSortOrder } from '@/types';
+import { DeleteBookConfirmation, AddBookModal } from '@/components';
 
 export default function Welcome() {
     const [books, setBooks] = useState<Book[]>([]);
@@ -16,14 +19,14 @@ export default function Welcome() {
         sort_order: 'desc',
     });
 
-    const [sortBy, setSortBy] = useState<string>('created_at');
-    const [sortOrder, setSortOrder] = useState<string>('desc');
+    const [sortBy, setSortBy] = useState<BookSortBy>(BookSortBy.CREATED_AT);
+    const [sortOrder, setSortOrder] = useState<BookSortOrder>(BookSortOrder.DESC);
     const [perPage, setPerPage] = useState<number>(5);
 
     const perPageOptions = [5, 10, 20, 50, 100];
 
     const fetchBooks = useCallback(
-        (page: number = 1, itemsPerPage: number = perPage, sortColumn: string = sortBy, sortDirection: string = sortOrder) => {
+        (page: number = 1, itemsPerPage: number = perPage, sortColumn: string = sortBy, sortDirection: BookSortOrder = sortOrder) => {
             fetch(`/api/v1/books?page=${page}&per_page=${itemsPerPage}&sort_by=${sortColumn}&sort_order=${sortDirection}`)
                 .then((response) => response.json())
                 .then((data) => {
@@ -35,7 +38,6 @@ export default function Welcome() {
                         per_page: itemsPerPage.toString(),
                         sort_by: sortColumn,
                         sort_order: sortDirection,
-                        q: '',
                     });
                 })
                 .catch((error) => {
@@ -61,6 +63,23 @@ export default function Welcome() {
     const handlePageChange = (page: number) => {
         fetchBooks(page, perPage, sortBy, sortOrder);
     };
+    const handleSortChange = (column: BookSortBy) => {
+        let newColumn = column;
+        let newOrder = BookSortOrder.ASC;
+
+        if (sortBy === column) {
+            if (sortOrder === BookSortOrder.ASC) {
+                newOrder = BookSortOrder.DESC;
+            } else {
+                newColumn = BookSortBy.CREATED_AT;
+                newOrder = BookSortOrder.DESC;
+            }
+        }
+
+        setSortBy(newColumn);
+        setSortOrder(newOrder);
+        fetchBooks(1, perPage, newColumn, newOrder);
+    };
     const handlePerPageChange = (value: string) => {
         const newPerPage = parseInt(value);
         setPerPage(newPerPage);
@@ -76,8 +95,8 @@ export default function Welcome() {
 
         const initialPerPage = urlPerPage ? parseInt(urlPerPage) : 5;
         const initialPage = urlPage ? parseInt(urlPage) : 1;
-        const initialSortBy = urlSortBy || 'created_at';
-        const initialSortOrder = urlSortOrder || 'desc';
+        const initialSortBy = (urlSortBy as BookSortBy) || BookSortBy.CREATED_AT;
+        const initialSortOrder = (urlSortOrder as BookSortOrder) || BookSortOrder.DESC;
 
         setPerPage(initialPerPage);
         setSortBy(initialSortBy);
@@ -97,8 +116,11 @@ export default function Welcome() {
                 </header>
                 <main className="w-full dark:text-white">
                     <div className="mx-auto max-w-3xl">
-                        <div>
-                            <div>
+                        <div className="mb-4 flex flex-col gap-4">
+                            <div className="flex justify-between">
+                                <div>
+                                    <AddBookModal onBookAdded={() => fetchBooks()} />
+                                </div>
                                 <div className="flex items-center space-x-2">
                                     <span className="text-sm">Items per page:</span>
                                     <Select value={perPage.toString()} onValueChange={handlePerPageChange}>
@@ -120,18 +142,72 @@ export default function Welcome() {
                             <TableCaption>List of Books</TableCaption>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[100px]">Title</TableHead>
-                                    <TableHead>Author</TableHead>
+                                    <TableHead className="hover:bg-accent/50 w-[350px] cursor-pointer" onClick={() => handleSortChange(BookSortBy.TITLE)}>
+                                        <div className="flex items-center space-x-1">
+                                            <span>Title</span>
+                                            {sortBy === 'title' ? (
+                                                sortOrder === BookSortOrder.ASC ? (
+                                                    <ArrowUpIcon className="h-4 w-4" />
+                                                ) : (
+                                                    <ArrowDownIcon className="h-4 w-4" />
+                                                )
+                                            ) : (
+                                                <ArrowUpDownIcon className="h-4 w-4 opacity-50" />
+                                            )}
+                                        </div>
+                                    </TableHead>
+                                    <TableHead className="hover:bg-accent/50 w-[350px] cursor-pointer" onClick={() => handleSortChange(BookSortBy.AUTHOR)}>
+                                        <div className="flex items-center space-x-1">
+                                            <span>Author</span>
+                                            {sortBy === 'author' ? (
+                                                sortOrder === BookSortOrder.ASC ? (
+                                                    <ArrowUpIcon className="h-4 w-4" />
+                                                ) : (
+                                                    <ArrowDownIcon className="h-4 w-4" />
+                                                )
+                                            ) : (
+                                                <ArrowUpDownIcon className="h-4 w-4 opacity-50" />
+                                            )}
+                                        </div>
+                                    </TableHead>
+                                    <TableHead className="w-[100px] text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {books.map((book) => {
                                     const { title, author, id } = book;
                                     return (
-                                        <TableRow key={id}>
-                                            <TableCell className="font-medium">{title}</TableCell>
-                                            <TableCell>{author}</TableCell>
-                                        </TableRow>
+                                            <TableRow key={id}>
+                                                <TableCell className="max-w-[350px] truncate font-medium">
+                                                    {title}
+                                                </TableCell>
+                                                <TableCell className="max-w-[350px] truncate">
+                                                    {author}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex justify-end space-x-1">
+                                                        <AddBookModal
+                                                            book={book}
+                                                            isEditMode={true}
+                                                            onBookUpdated={() =>
+fetchBooks(meta.current_page, perPage, sortBy, sortOrder)
+                                                            }
+                                                            triggerButton={
+                                                                <Button size="icon" variant="ghost" className="h-8 w-8">
+                                                                    <PencilIcon className="h-4 w-4" />
+                                                                </Button>
+                                                            }
+                                                        />
+                                                        <DeleteBookConfirmation
+                                                            bookId={id}
+                                                            bookTitle={title}
+                                                            onBookDeleted={() =>
+fetchBooks(meta.current_page, perPage, sortBy, sortOrder)
+                                                            }
+                                                        />
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
                                     );
                                 })}
                             </TableBody>
