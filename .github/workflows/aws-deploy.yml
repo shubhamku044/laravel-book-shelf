@@ -25,9 +25,6 @@ jobs:
 
       - name: Build Docker images
         run: |
-          # Build and tag the image
           docker compose build --progress=plain app
-          docker tag app:latest ${{ secrets.AWS_ECR_REPO_URI }}:latest
-          
-          # Push to ECR
-          docker push ${{ secrets.AWS_ECR_REPO_URI }}:latest
+          docker tag laravel-book-shelf-app:latest ${{ secrets.AWS_ECR_REPO_URI }}:latest
+          # docker push ${{ secrets.AWS_ECR_REPO_URI }}:latest
