@@ -47,7 +47,8 @@ jobs:
           task-definition: ${{ secrets.AWS_ECS_TASK_DEFINITION }}
           service: ${{ secrets.AWS_ECS_SERVICE }}
           cluster: ${{ secrets.AWS_ECS_CLUSTER }}
-          container-name: laravel-bookshelf-container
-          image-tag: ${{ github.sha }}
           wait-for-service-stability: true
           wait-for-minutes: 15
+        env:
+          AWS_ECR_REPO_URI: ${{ secrets.AWS_ECR_REPO_URI }}
+          IMAGE_TAG: ${{ github.sha }}
