@@ -2,7 +2,7 @@ name: AWS Deployment
 
 on:
   push:
-    branches: [main]
+    branches: [ci-cd]
 
 jobs:
   deploy:
@@ -25,14 +25,11 @@ jobs:
 
       - name: Build Docker images
         run: |
-          # Build the image with the correct tag
           docker compose build --progress=plain app
 
-          # Get the image ID
           IMAGE_ID=$(docker images -q app:latest)
 
-          # Tag and push to ECR
-          docker tag $IMAGE_ID ${{ secrets.AWS_ECR_REPO_URI }}:latest
-          docker tag $IMAGE_ID ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
-          docker push ${{ secrets.AWS_ECR_REPO_URI }}:latest
-          docker push ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
+          # docker tag $IMAGE_ID ${{ secrets.AWS_ECR_REPO_URI }}:latest
+          # docker tag $IMAGE_ID ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
+          # docker push ${{ secrets.AWS_ECR_REPO_URI }}:latest
+          # docker push ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
