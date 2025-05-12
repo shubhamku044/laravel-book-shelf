@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { toast } from 'sonner';
 import { TrashIcon } from 'lucide-react';
 import { useState } from 'react';
 
@@ -13,6 +14,7 @@ interface DeleteBookConfirmationProps {
 export default function DeleteBookConfirmation({ bookId, bookTitle, onBookDeleted, triggerButton }: DeleteBookConfirmationProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+
 
     const handleDelete = async () => {
         if (isDeleting) return;
@@ -32,15 +34,21 @@ export default function DeleteBookConfirmation({ bookId, bookTitle, onBookDelete
                 throw new Error('Failed to delete book');
             }
 
-            // Close the dialog
-            setIsOpen(false);
-
-            // Notify parent component
-            if (onBookDeleted) {
-                onBookDeleted();
-            }
+            // Show success toast first, then close the dialog
+            toast.success(`Book "${bookTitle}" deleted successfully`);
+            
+            // Close the dialog after a small delay to ensure toast is visible
+            setTimeout(() => {
+                setIsOpen(false);
+                
+                // Notify parent component
+                if (onBookDeleted) {
+                    onBookDeleted();
+                }
+            }, 100); // Small delay to ensure toast is created before modal closes
         } catch (error) {
             console.error('Error deleting book:', error);
+            toast.error(`Error deleting book: ${error instanceof Error ? error.message : 'Unknown error'}`);
         } finally {
             setIsDeleting(false);
         }

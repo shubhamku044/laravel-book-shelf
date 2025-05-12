@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/components/ui/toast';
+import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
 
 interface Book {
@@ -30,7 +30,6 @@ export default function AddBookModal({
     isEditMode = false,
     triggerButton,
 }: AddBookModalProps) {
-    const { showToast, ToastContainer } = useToast();
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
@@ -119,7 +118,7 @@ export default function AddBookModal({
                 }
 
                 if (data.isDuplicate) {
-                    showToast(data.error || 'A book with the same title and author already exists.', 'warning');
+                    toast.warning(data.error || 'A book with the same title and author already exists.');
                     return;
                 }
 
@@ -131,13 +130,16 @@ export default function AddBookModal({
             setErrors({});
             setOpen(false);
 
-            if (isEditMode && onBookUpdated) {
-                onBookUpdated();
-            } else if (!isEditMode && onBookAdded) {
-                onBookAdded();
+            if (isEditMode) {
+                toast.success('Book updated successfully');
+                if (onBookUpdated) onBookUpdated();
+            } else {
+                toast.success('Book added successfully');
+                if (onBookAdded) onBookAdded();
             }
         } catch (error) {
             console.error(`Error ${isEditMode ? 'updating' : 'adding'} book:`, error);
+            toast.error(`Error ${isEditMode ? 'updating' : 'adding'} book: ${error instanceof Error ? error.message : 'Unknown error'}`);
         } finally {
             setIsSubmitting(false);
         }
@@ -145,7 +147,6 @@ export default function AddBookModal({
 
     return (
         <>
-            <ToastContainer />
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>{triggerButton || <Button>{buttonLabel}</Button>}</DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
