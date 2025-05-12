@@ -10,3 +10,7 @@ Route::get('/', function () {
 Route::get('/health', function () {
     return response()->json(['status' => 'ok']);
 })->name('health');
+
+Route::get('/{any}', function () {
+    return Inertia::render('NotFound');
+})->where('any', '.*')->name('not-found');
