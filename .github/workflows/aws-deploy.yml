@@ -1,11 +1,11 @@
-name: AWS Deployment
+name: AWS CI/CD Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: [main, ci-cd]
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,14 +25,49 @@ jobs:
 
       - name: Build Docker images
         run: |
-          # Build the image with the correct tag
-          docker compose build --progress=plain app
+          # Build the app service with --no-cache to ensure fresh build
+          docker compose build --progress=plain --no-cache app
 
-          # Get the image ID
-          IMAGE_ID=$(docker images -q app:latest)
+          # Get the image ID from the built image
+          IMAGE_ID=$(docker images -q laravel-book-shelf-app:latest)
+          echo "Built image ID: $IMAGE_ID"
 
-          # Tag and push to ECR
+          # Tag with both latest and commit hash
           docker tag $IMAGE_ID ${{ secrets.AWS_ECR_REPO_URI }}:latest
           docker tag $IMAGE_ID ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
+          echo "Tagged images with latest and ${{ github.sha }}"
+
+      - name: Push to Amazon ECR
+        run: |
+          # Push both tags to ECR
           docker push ${{ secrets.AWS_ECR_REPO_URI }}:latest
           docker push ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
+          echo "Pushed images to ECR: ${{ secrets.AWS_ECR_REPO_URI }}:latest and ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}"
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Login to ECR
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REPO_URI }}
+            
+            # Pull the latest image
+            docker pull ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
+            
+            # Stop and remove any existing container
+            docker stop laravel-app || true
+            docker rm laravel-app || true
+            
+            # Run the new container
+            docker run -d \
+              --name laravel-app \
+              -p 80:80 \
+              -e APP_ENV=production \
+              -e APP_DEBUG=false \
+              ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
+            
+            # Clean up old images
+            docker system prune -af

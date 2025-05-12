@@ -4,6 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: laravel-bookshelf-app
+    image: laravel-book-shelf-app:latest
     restart: unless-stopped
     volumes:
       - ./:/var/www/html
