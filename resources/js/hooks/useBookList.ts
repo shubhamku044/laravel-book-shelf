@@ -248,24 +248,45 @@ export function useBookList() {
   const handleSortChange = useCallback(
     (column: BookSortBy) => {
       if (isLoading) return;
-      const newSortDirection = column === sortBy && sortOrder === BookSortOrder.ASC ? BookSortOrder.DESC : BookSortOrder.ASC;
-      console.log('newSortDirection', newSortDirection);
+
+      let newSortBy = column;
+      let newSortDirection = sortOrder;
+
+      if (column === sortBy) {
+        if (sortOrder === BookSortOrder.ASC) {
+          newSortDirection = BookSortOrder.DESC;
+        } else {
+          newSortBy = BookSortBy.CREATED_AT;
+          newSortDirection = BookSortOrder.DESC;
+        }
+      } else {
+        newSortDirection = BookSortOrder.ASC;
+      }
+
 
       dispatch({
         type: 'SET_SORT',
         payload: {
-          sortBy: column,
+          sortBy: newSortBy,
           sortOrder: newSortDirection
         }
       });
 
+      updateUrlParams({
+        page: '1',
+        per_page: perPage.toString(),
+        sort_by: newSortBy,
+        sort_order: newSortDirection,
+        ...(searchQuery ? { q: searchQuery } : {}),
+      });
+
       if (isSearching) {
-        searchBooks(searchQuery, 1, perPage, column, newSortDirection);
+        searchBooks(searchQuery, 1, perPage, newSortBy, newSortDirection);
       } else {
-        fetchBooks(1, perPage, column, newSortDirection);
+        fetchBooks(1, perPage, newSortBy, newSortDirection);
       }
     },
-    [fetchBooks, isLoading, isSearching, perPage, searchBooks, searchQuery, sortBy, sortOrder]
+    [fetchBooks, isLoading, isSearching, perPage, searchBooks, searchQuery, sortBy, sortOrder, updateUrlParams]
   );
 
   const handlePerPageChange = useCallback(
@@ -303,7 +324,6 @@ export function useBookList() {
     const sortOrderParam = searchParams.get('sort_order') as BookSortOrder || BookSortOrder.DESC;
     const searchParam = searchParams.get('q') || '';
 
-    // Update state based on URL parameters
     dispatch({ type: 'SET_PER_PAGE', payload: perPageParam });
     dispatch({
       type: 'SET_SORT',
@@ -347,14 +367,6 @@ export function useBookList() {
     const initialSortBy = searchParams.get('sort_by') || 'created_at';
     const initialSortOrder = (searchParams.get('sort_order') as BookSortOrder) || 'desc';
     const initialSearchQuery = searchParams.get('q') || '';
-
-    console.log('Initial URL params:', {
-      page: initialPage,
-      per_page: initialPerPage,
-      sort_by: initialSortBy,
-      sort_order: initialSortOrder,
-      q: initialSearchQuery
-    });
 
     dispatch({ type: 'SET_PER_PAGE', payload: initialPerPage });
     dispatch({

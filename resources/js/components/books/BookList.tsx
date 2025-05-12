@@ -114,7 +114,7 @@ export function BookList() {
                                     >
                                         <div className="flex items-center space-x-1">
                                             <span>Title</span>
-                                            {sortBy === 'title' ? (
+                                            {sortBy === BookSortBy.TITLE ? (
                                                 sortOrder === BookSortOrder.ASC ? (
                                                     <ArrowUpIcon className="h-4 w-4" />
                                                 ) : (
@@ -131,7 +131,7 @@ export function BookList() {
                                     >
                                         <div className="flex items-center space-x-1">
                                             <span>Author</span>
-                                            {sortBy === 'author' ? (
+                                            {sortBy === BookSortBy.AUTHOR ? (
                                                 sortOrder === BookSortOrder.ASC ? (
                                                     <ArrowUpIcon className="h-4 w-4" />
                                                 ) : (
