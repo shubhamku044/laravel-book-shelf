@@ -48,8 +48,8 @@ jobs:
         run: |
           aws ecs describe-task-definition \
             --task-definition ${{ secrets.AWS_ECS_TASK_DEFINITION }} \
-            --query taskDefinition > task-definition.json
-          echo "Downloaded current task definition"
+            --query 'taskDefinition | {family: family, executionRoleArn: executionRoleArn, networkMode: networkMode, containerDefinitions: containerDefinitions, volumes: volumes, placementConstraints: placementConstraints, requiresCompatibilities: requiresCompatibilities, cpu: cpu, memory: memory}' > task-definition.json
+          echo "Downloaded and filtered current task definition"
 
       - name: Update container image in task definition
         id: task-def
