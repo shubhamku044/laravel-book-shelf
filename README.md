@@ -1,5 +1,84 @@
 # Laravel Book Shelf
 
+## AWS CI/CD Pipeline Setup
+
+This project is configured with a CI/CD pipeline that automatically builds and deploys the application to AWS when changes are pushed to the main branch.
+
+### Prerequisites
+
+- AWS account with appropriate permissions
+- GitHub repository
+- Docker installed locally for testing
+
+### AWS Resources Setup
+
+1. **Create an ECR Repository**
+
+```bash
+aws ecr create-repository --repository-name laravel-book-shelf
+```
+
+2. **Create an ECS Cluster**
+
+```bash
+aws ecs create-cluster --cluster-name laravel-book-shelf-cluster
+```
+
+3. **Create IAM Roles**
+
+Create an ECS task execution role with permissions for ECR and CloudWatch Logs.
+
+4. **Create a Task Definition**
+
+Use the `task-definition.json` file in this repository as a template.
+
+5. **Create an ECS Service**
+
+```bash
+aws ecs create-service \
+  --cluster laravel-book-shelf-cluster \
+  --service-name laravel-book-shelf-service \
+  --task-definition laravel-book-shelf-task \
+  --desired-count 1 \
+  --launch-type FARGATE \
+  --network-configuration "awsvpcConfiguration={subnets=[subnet-12345678],securityGroups=[sg-12345678],assignPublicIp=ENABLED}"
+```
+
+### GitHub Secrets Setup
+
+Add the following secrets to your GitHub repository:
+
+1. `AWS_ACCESS_KEY_ID`: Your AWS access key
+2. `AWS_SECRET_ACCESS_KEY`: Your AWS secret key
+3. `AWS_REGION`: Your AWS region (e.g., us-east-1)
+4. `AWS_ECR_REPO_URI`: Your ECR repository URI (e.g., `123456789012.dkr.ecr.us-east-1.amazonaws.com/laravel-book-shelf`)
+5. `AWS_ECS_CLUSTER`: The name of your ECS cluster (e.g., `laravel-book-shelf-cluster`)
+6. `AWS_ECS_SERVICE`: The name of your ECS service (e.g., `laravel-book-shelf-service`)
+7. `AWS_ECS_TASK_DEFINITION`: The name of your ECS task definition (e.g., `laravel-book-shelf-task`)
+
+### CI/CD Pipeline Workflow
+
+The CI/CD pipeline performs the following steps:
+
+1. Builds the Docker image
+2. Tags the image with both `latest` and the commit SHA
+3. Pushes the tagged images to ECR
+4. Updates the ECS task definition with the new image
+5. Deploys the updated task definition to ECS
+6. Waits for the deployment to stabilize
+
+### Testing the Pipeline
+
+To test the pipeline, push changes to the `main` or `ci-cd` branch:
+
+```bash
+git add .
+git commit -m "Test CI/CD pipeline"
+git push origin main
+```
+
+You can monitor the progress in the GitHub Actions tab of your repository.
+
 A modern web application built with Laravel, React, and Inertia.js for managing your personal book collection.
 
 ## Tech Stack
