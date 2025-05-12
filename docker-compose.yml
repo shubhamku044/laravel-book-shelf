@@ -40,6 +40,18 @@ services:
       - '5173:5173'
     networks:
       - bookshelf
+      
+  # Build frontend assets for production
+  build-frontend:
+    image: node:20-slim
+    container_name: laravel-bookshelf-build
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html
+    profiles: ['build']
+    command: bash -c "npm ci && npm run build"
+    networks:
+      - bookshelf
 
 networks:
   bookshelf:

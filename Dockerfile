@@ -8,9 +8,10 @@ RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
 FROM node:21-alpine AS frontend
 
 WORKDIR /app
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json vite.config.ts tsconfig.json ./
+COPY resources/ ./resources/
+COPY public/ ./public/
 RUN npm ci
-COPY . .
 RUN npm run build
 
 FROM php:8.2-fpm
