@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/components/ui/toast';
 import { useEffect, useState } from 'react';
 
 interface Book {
@@ -29,6 +30,7 @@ export default function AddBookModal({
     isEditMode = false,
     triggerButton,
 }: AddBookModalProps) {
+    const { showToast, ToastContainer } = useToast();
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
@@ -115,16 +117,20 @@ export default function AddBookModal({
                     });
                     return;
                 }
+
+                if (data.isDuplicate) {
+                    showToast(data.error || 'A book with the same title and author already exists.', 'warning');
+                    return;
+                }
+
                 throw new Error(data.message || `Failed to ${isEditMode ? 'update' : 'add'} book`);
             }
 
-            // Success
             setTitle('');
             setAuthor('');
             setErrors({});
             setOpen(false);
 
-            // Notify parent component
             if (isEditMode && onBookUpdated) {
                 onBookUpdated();
             } else if (!isEditMode && onBookAdded) {
@@ -138,8 +144,10 @@ export default function AddBookModal({
     };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>{triggerButton || <Button>{buttonLabel}</Button>}</DialogTrigger>
+        <>
+            <ToastContainer />
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>{triggerButton || <Button>{buttonLabel}</Button>}</DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
@@ -186,6 +194,7 @@ export default function AddBookModal({
                     </DialogFooter>
                 </form>
             </DialogContent>
-        </Dialog>
+            </Dialog>
+        </>
     );
 }

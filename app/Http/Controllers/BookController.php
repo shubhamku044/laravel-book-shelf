@@ -81,6 +81,20 @@ class BookController extends Controller
                 'author.max' => 'The author name may not be longer than 255 characters.',
             ]);
             
+            // Check for duplicate book (same title and author)
+            $existingBook = Book::where('title', $validated['title'])
+                ->where('author', $validated['author'])
+                ->first();
+                
+            if ($existingBook) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Duplicate book entry',
+                    'error' => 'A book with the same title and author already exists.',
+                    'isDuplicate' => true,
+                ], 422);
+            }
+            
             $book = Book::create($validated);
             
             return response()->json([

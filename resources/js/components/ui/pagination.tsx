@@ -18,7 +18,6 @@ export function Pagination({ meta, onPageChange  }: PaginationProps) {
 
   const handleNext = () => {
     if (current_page < last_page) {
-        console.log('Next page:', current_page + 1);
       onPageChange(current_page + 1);
     }
   };
