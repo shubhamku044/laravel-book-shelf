@@ -44,25 +44,30 @@ jobs:
           docker push ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
           echo "Pushed images to ECR: ${{ secrets.AWS_ECR_REPO_URI }}:latest and ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}"
 
-      - name: Download task definition
-        run: |
-          aws ecs describe-task-definition \
-            --task-definition ${{ secrets.AWS_ECS_TASK_DEFINITION }} \
-            --query 'taskDefinition | {family: family, executionRoleArn: executionRoleArn, networkMode: networkMode, containerDefinitions: containerDefinitions, volumes: volumes, placementConstraints: placementConstraints, requiresCompatibilities: requiresCompatibilities, cpu: cpu, memory: memory}' > task-definition.json
-          echo "Downloaded and filtered current task definition"
-
-      - name: Update container image in task definition
-        id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
         with:
-          task-definition: task-definition.json
-          container-name: laravel-app
-          image: ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
-
-      - name: Deploy to Amazon ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ secrets.AWS_ECS_SERVICE }}
-          cluster: ${{ secrets.AWS_ECS_CLUSTER }}
-          wait-for-service-stability: true
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Login to ECR
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REPO_URI }}
+            
+            # Pull the latest image
+            docker pull ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
+            
+            # Stop and remove any existing container
+            docker stop laravel-app || true
+            docker rm laravel-app || true
+            
+            # Run the new container
+            docker run -d \
+              --name laravel-app \
+              -p 80:80 \
+              -e APP_ENV=production \
+              -e APP_DEBUG=false \
+              ${{ secrets.AWS_ECR_REPO_URI }}:${{ github.sha }}
+            
+            # Clean up old images
+            docker system prune -af
