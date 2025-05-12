@@ -40,6 +40,12 @@ class BookController extends Controller
                     'sort_order' => $sortOrder,
                 ],
             ], 200);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $e->errors(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -93,11 +99,11 @@ class BookController extends Controller
                 'message' => 'Book retrieved successfully.',
                 'data' => $book,
             ], 200);
-        } catch (\Exception $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve book.',
-                'error' => $e->getMessage(),
+                'error' => 'Book not found',
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
@@ -133,8 +139,8 @@ class BookController extends Controller
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Book not found.',
-                'error' => 'Resource not found',
+                'message' => 'Failed to update book.',
+                'error' => 'Book not found',
             ], 404);
         } catch (ValidationException $e) {
             return response()->json([
@@ -170,7 +176,7 @@ class BookController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => "Successfully created {$createdCount} books.",
+                'message' => "Books created successfully.",
                 'count' => $createdCount
             ], 201);
         } catch (ValidationException $e) {
@@ -201,6 +207,12 @@ class BookController extends Controller
                 'success' => true,
                 'message' => 'Book deleted successfully.',
             ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete book.',
+                'error' => 'Book not found',
+            ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -209,12 +221,16 @@ class BookController extends Controller
             ], 500);
         }
     }
+    
+    /**
+     * Generate CSV response for books.
+     */
     private function generateCsv($books, $fields, $filename)
     {
         // Set headers for CSV download
         $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename=' . $filename,
         ];
 
         // Stream CSV directly to output
@@ -236,6 +252,7 @@ class BookController extends Controller
             $headers
         );
     }
+
     private function generateXml($books, $fields, $filename)
     {
         // Create XML root element
@@ -253,7 +270,7 @@ class BookController extends Controller
         // Set headers and return XML
         return response($xml->asXML())
             ->header('Content-Type', 'application/xml')
-            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+            ->header('Content-Disposition', 'attachment; filename=' . $filename);
     }
     private function formatResponse($format, $books, $fields, $filename)
     {
