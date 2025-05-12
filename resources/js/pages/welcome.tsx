@@ -61,8 +61,8 @@ export default function Welcome() {
                 regex,
                 '<mark class="bg-yellow-200 dark:bg-amber-700 text-black dark:text-white highlight-animation" style="padding: 0; margin: 0; border-radius: 2px;">$1</mark>',
             );
-        } catch (e) {
-            console.error('Error highlighting search term:', e);
+        } catch {
+            // Return original text if regex fails
             return text;
         }
     };
@@ -81,7 +81,6 @@ export default function Welcome() {
             fetch(`/api/v1/books?page=${page}&per_page=${itemsPerPage}&sort_by=${sortColumn}&sort_order=${sortDirection}`)
                 .then((response) => response.json())
                 .then((data) => {
-                    console.log('Books:', data);
                     setBooks(data.data);
                     setMeta(data.meta || meta);
                     updateUrlParams({
@@ -92,8 +91,8 @@ export default function Welcome() {
                         q: '',
                     });
                 })
-                .catch((error) => {
-                    console.error('Error fetching books:', error);
+                .catch(() => {
+                    // Handle error silently
                 });
         },
         [meta, sortBy, sortOrder, perPage],
@@ -126,10 +125,8 @@ export default function Welcome() {
         )
             .then((response) => response.json())
             .then((data) => {
-                console.log('Search results:', data);
                 setBooks(data.data);
                 setMeta(data.meta || meta);
-
                 updateUrlParams({
                     q: query,
                     page: page.toString(),
@@ -138,8 +135,8 @@ export default function Welcome() {
                     sort_order: sortDirection,
                 });
             })
-            .catch((error) => {
-                console.error('Error searching books:', error);
+            .catch(() => {
+                // Handle error silently
             })
             .finally(() => {
                 setIsSearching(false);
