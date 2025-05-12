@@ -2,8 +2,8 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 interface Book {
     id: number;
@@ -149,52 +149,54 @@ export default function AddBookModal({
         <>
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>{triggerButton || <Button>{buttonLabel}</Button>}</DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-                <form onSubmit={handleSubmit}>
-                    <DialogHeader>
-                        <DialogTitle>{isEditMode ? 'Edit Book' : 'Add New Book'}</DialogTitle>
-                        <DialogDescription>
-                            {isEditMode ? 'Update the details of this book.' : 'Enter the details of the book you want to add to your collection.'}
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid gap-2">
-                            <Label htmlFor="title" className="text-left">
-                                Title
-                            </Label>
-                            <Input
-                                id="title"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                placeholder="Enter book title"
-                                className={errors.title ? 'border-red-500' : ''}
-                            />
-                            {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
+                <DialogContent className="sm:max-w-[425px]">
+                    <form onSubmit={handleSubmit}>
+                        <DialogHeader>
+                            <DialogTitle>{isEditMode ? 'Edit Book' : 'Add New Book'}</DialogTitle>
+                            <DialogDescription>
+                                {isEditMode
+                                    ? 'Update the details of this book.'
+                                    : 'Enter the details of the book you want to add to your collection.'}
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="title" className="text-left">
+                                    Title
+                                </Label>
+                                <Input
+                                    id="title"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    placeholder="Enter book title"
+                                    className={errors.title ? 'border-red-500' : ''}
+                                />
+                                {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="author" className="text-left">
+                                    Author
+                                </Label>
+                                <Input
+                                    id="author"
+                                    value={author}
+                                    onChange={(e) => setAuthor(e.target.value)}
+                                    placeholder="Enter author name"
+                                    className={errors.author ? 'border-red-500' : ''}
+                                />
+                                {errors.author && <p className="text-sm text-red-500">{errors.author}</p>}
+                            </div>
                         </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="author" className="text-left">
-                                Author
-                            </Label>
-                            <Input
-                                id="author"
-                                value={author}
-                                onChange={(e) => setAuthor(e.target.value)}
-                                placeholder="Enter author name"
-                                className={errors.author ? 'border-red-500' : ''}
-                            />
-                            {errors.author && <p className="text-sm text-red-500">{errors.author}</p>}
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isSubmitting}>
-                            Cancel
-                        </Button>
-                        <Button type="submit" disabled={isSubmitting || (isEditMode && !hasChanged())}>
-                            {isSubmitting ? (isEditMode ? 'Updating...' : 'Adding...') : isEditMode ? 'Update Book' : 'Add Book'}
-                        </Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isSubmitting}>
+                                Cancel
+                            </Button>
+                            <Button type="submit" disabled={isSubmitting || (isEditMode && !hasChanged())}>
+                                {isSubmitting ? (isEditMode ? 'Updating...' : 'Adding...') : isEditMode ? 'Update Book' : 'Add Book'}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
             </Dialog>
         </>
     );

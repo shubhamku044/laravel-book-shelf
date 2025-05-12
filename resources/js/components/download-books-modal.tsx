@@ -4,8 +4,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface DownloadBooksModalProps {
     onDownload?: () => void;
@@ -16,7 +16,6 @@ export default function DownloadBooksModal({ onDownload }: DownloadBooksModalPro
     const [format, setFormat] = useState<'csv' | 'xml'>('csv');
     const [selectedFields, setSelectedFields] = useState<string[]>(['title', 'author']);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
 
     const handleFieldChange = (field: string) => {
         setSelectedFields((prevFields) => {

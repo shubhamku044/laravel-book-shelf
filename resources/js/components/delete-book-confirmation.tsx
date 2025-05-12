@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { toast } from 'sonner';
 import { TrashIcon } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface DeleteBookConfirmationProps {
     bookId: number;
@@ -14,7 +14,6 @@ interface DeleteBookConfirmationProps {
 export default function DeleteBookConfirmation({ bookId, bookTitle, onBookDeleted, triggerButton }: DeleteBookConfirmationProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
-
 
     const handleDelete = async () => {
         if (isDeleting) return;
@@ -36,11 +35,11 @@ export default function DeleteBookConfirmation({ bookId, bookTitle, onBookDelete
 
             // Show success toast first, then close the dialog
             toast.success(`Book "${bookTitle}" deleted successfully`);
-            
+
             // Close the dialog after a small delay to ensure toast is visible
             setTimeout(() => {
                 setIsOpen(false);
-                
+
                 // Notify parent component
                 if (onBookDeleted) {
                     onBookDeleted();

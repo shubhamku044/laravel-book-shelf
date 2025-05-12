@@ -1,8 +1,8 @@
 import { AddBookModal, DeleteBookConfirmation, DownloadBooksModal } from '@/components';
 import { Button, Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Pagination } from '@/components/ui/pagination';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BookSortBy, BookSortOrder } from '@/types';
 import { Book } from '@/types/api';
 import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon, PencilIcon, SearchIcon } from 'lucide-react';
@@ -37,9 +37,7 @@ export function BookList() {
                         <DownloadBooksModal />
                     </div>
                     <div className="flex items-center space-x-2">
-                        <p className="text-sm text-muted-foreground">
-                            Rows per page
-                        </p>
+                        <p className="text-muted-foreground text-sm">Rows per page</p>
                         <Select
                             value={String(meta.per_page)}
                             onValueChange={(value) => {
@@ -157,7 +155,9 @@ export function BookList() {
                                             ) : searchComplete && searchQuery.trim() ? (
                                                 <div>
                                                     <p className="font-medium">No books found matching "{searchQuery.trim()}"</p>
-                                                    <p className="text-sm text-muted-foreground mt-1">Try a different search term or clear the search.</p>
+                                                    <p className="text-muted-foreground mt-1 text-sm">
+                                                        Try a different search term or clear the search.
+                                                    </p>
                                                 </div>
                                             ) : (
                                                 'No books available.'
@@ -171,18 +171,14 @@ export function BookList() {
                                             <TableRow key={id}>
                                                 <TableCell className="max-w-[40%] truncate font-medium">
                                                     {searchQuery.trim() ? (
-                                                        <span
-                                                            dangerouslySetInnerHTML={{ __html: highlightSearchTerm(title, searchQuery.trim()) }}
-                                                        />
+                                                        <span dangerouslySetInnerHTML={{ __html: highlightSearchTerm(title, searchQuery.trim()) }} />
                                                     ) : (
                                                         title
                                                     )}
                                                 </TableCell>
                                                 <TableCell className="max-w-[40%] truncate">
                                                     {searchQuery.trim() ? (
-                                                        <span
-                                                            dangerouslySetInnerHTML={{ __html: highlightSearchTerm(author, searchQuery.trim()) }}
-                                                        />
+                                                        <span dangerouslySetInnerHTML={{ __html: highlightSearchTerm(author, searchQuery.trim()) }} />
                                                     ) : (
                                                         author
                                                     )}
@@ -220,15 +216,8 @@ export function BookList() {
                         </Table>
                     </div>
                 )}
-                {books.length === 0 && (
-                    <p className="text-center py-4">No books found.</p>
-                )}
-                {books.length > 0 && (
-                    <Pagination
-                        meta={meta}
-                        onPageChange={handlePageChange}
-                    />
-                )}
+                {books.length === 0 && <p className="py-4 text-center">No books found.</p>}
+                {books.length > 0 && <Pagination meta={meta} onPageChange={handlePageChange} />}
             </div>
         </div>
     );
