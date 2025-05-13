@@ -1,7 +1,7 @@
 # 📚 Laravel Book Shelf
 A modern web application for managing your personal book collection, built with Laravel, React, and Inertia.js.
 
-🌐 **[Live Demo](https://book-shelf.shubhams.dev/)** | 📦 **[GitHub Repository](https://github.com/shubhamku044/laravel-book-shelf)**
+🌐 **[Live Demo](https://book-shelf.shubhams.dev/)** | 📦 **[GitHub Repository](https://github.com/shubhamku044/laravel-book-shelf)** | 📷 **[Demo Video](https://www.loom.com/share/7c235667e1314b9980842a65fa05b87d?sid=35b171db-b7d2-4d87-b124-24c7e16e2b24)**
 
 ![Architecture Diagram](application.png)
 
