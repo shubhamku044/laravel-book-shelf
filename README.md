@@ -1,171 +1,139 @@
-# Laravel Book Shelf
+# 📚 Laravel Book Shelf
+A modern web application for managing your personal book collection, built with Laravel, React, and Inertia.js.
 
-A modern web application built with Laravel, React, and Inertia.js for managing your personal book collection.
+🌐 **[Live Demo](https://book-shelf.shubhams.dev/)** | 📦 **[GitHub Repository](https://github.com/shubhamku044/laravel-book-shelf)**
 
-## Architecture Diagram
+![Architecture Diagram](application.png)
+
+## ✨ Features
+
+- 📝 CRUD operations for book management
+- 🔍 Search, sort, and filter your book collection
+- 🌙 Dark mode support
+- 🔔 Modern toast notifications
+- 📱 Responsive design for all devices
+- 🐳 Docker support for easy setup
+
+## 🏗️ Architecture
+
 ![Architecture Diagram](image.png)
 
-### Architecture Explanation
+The application follows a modern single-page application architecture with server-side rendering:
 
-The Laravel Book Shelf application follows a modern single-page application architecture with server-side rendering capabilities. Here's a breakdown of each component:
+- **Backend**: Laravel handles API requests and business logic
+- **Frontend**: React components with TypeScript and Tailwind CSS
+- **Integration**: Inertia.js connects Laravel and React
+- **Database**: SQLite for lightweight data storage
 
-#### Backend Layer
-- **Laravel Backend**: Serves as the core application server, handling API requests, authentication, and business logic
-- **Database (SQLite)**: Stores book information, user data, and application state
-- **API Routes**: RESTful endpoints for CRUD operations on books
+## 🚀 Quick Start
 
-#### Integration Layer
-- **Inertia.js**: Bridges the gap between Laravel and React, allowing server-side rendering while maintaining a SPA experience
-- **Data Flow**: Server-rendered initial page loads with client-side navigation for subsequent interactions
+## 🛠️ Development Setup
 
-#### Frontend Layer
-- **React Components**: Built with TypeScript for type safety and better developer experience
-- **UI Framework**: Uses Shadcn UI components built on Tailwind CSS for a consistent, responsive design
-- **State Management**: Local React state for component-level state, with Inertia handling page-level state
+### Option 1: Using Docker (Recommended)
 
-#### Key UI Components
-- **Book List**: Displays all books with sorting and filtering capabilities
-- **Add/Edit Modal**: Form for creating new books or editing existing ones
-- **Delete Dialog**: Confirmation dialog for book deletion with toast notifications
-- **Toast Notifications**: Sonner-based toast system for user feedback
-- **404 Page**: Custom animated page for handling unknown routes
+```bash
+# Clone the repository
+git clone https://github.com/shubhamku044/laravel-book-shelf.git
+cd laravel-book-shelf
 
-#### Data Flow
-1. User interacts with the React UI
-2. Inertia.js handles client-side navigation and server requests
-3. Laravel processes requests and interacts with the SQLite database
-4. Response data is sent back to the client
-5. React updates the UI based on the new data
+# Configure environment
+cp .env.example .env
 
-## Tech Stack
+# Start Docker containers
+docker compose up -d
 
-- **Backend**: Laravel 12.x
-- **Frontend**: React 19.x with TypeScript
-- **UI Framework**: Tailwind CSS 4.x
-- **Database**: SQLite
-- **Development**: Docker
-- **Testing**: Pest PHP
+# Set up application
+docker compose exec app composer install
+docker compose exec app php artisan key:generate
+docker compose exec app php artisan migrate
+```
 
-## Prerequisites
+Access at: http://localhost:8080
 
-- Docker and Docker Compose
-- Git
-- Node.js 21.x (for local development)
-- PHP 8.2+ (for local development)
-- Composer (for local development)
+### Option 2: Local Development
 
-## Prerequisites
+```bash
+# Clone and enter project
+git clone https://github.com/shubhamku044/laravel-book-shelf.git
+cd laravel-book-shelf
 
-- Docker and Docker Compose
-- Git
-- Node.js 21.x (for local development)
-- PHP 8.2+ (for local development)
-- Composer (for local development)
+# Install dependencies
+composer install
+npm install
 
-## Local Development Setup
+# Configure environment
+cp .env.example .env
+php artisan key:generate
 
-### Using Docker (Recommended)
+# Set up database
+touch database/database.sqlite
+chmod 666 database/database.sqlite
+php artisan migrate
 
-1. Clone the repository:
+# Start development server
+composer run dev
+```
+
+## 🚢 Deployment
+
+### Deploy to EC2 with Docker
+
+1. **Set up EC2 instance**
+   - Launch an Ubuntu EC2 instance
+   - Configure security group to allow HTTP (80) and HTTPS (443)
+
+2. **Install Docker and Docker Compose**
+   ```bash
+   sudo apt update
+   sudo apt install docker.io docker-compose
+   sudo usermod -aG docker $USER
+   ```
+
+3. **Clone and configure the project**
    ```bash
    git clone https://github.com/shubhamku044/laravel-book-shelf.git
    cd laravel-book-shelf
-   ```
-
-2. Create and configure your environment file:
-   ```bash
    cp .env.example .env
+   # Edit .env for production settings
    ```
 
-3. Build and start the Docker containers:
+4. **Set up SSL certificates**
    ```bash
-   docker compose build --no-cache
-   docker compose up -d
+   # Create directory for certificates
+   mkdir -p docker/nginx/ssl
+   
+   # Install certbot
+   sudo apt install certbot python3-certbot-nginx
+   
+   # Get certificate (replace with your domain)
+   sudo certbot certonly --standalone -d book-shelf.shubhams.dev
+   
+   # Copy certificates
+   sudo cp /etc/letsencrypt/live/book-shelf.shubhams.dev/fullchain.pem docker/nginx/ssl/
+   sudo cp /etc/letsencrypt/live/book-shelf.shubhams.dev/privkey.pem docker/nginx/ssl/
+   sudo chmod -R 755 docker/nginx/ssl
    ```
 
-4. Install dependencies and set up the database:
+5. **Deploy with production configuration**
    ```bash
-   docker compose exec app composer install
-   docker compose exec app php artisan key:generate
-   docker compose exec app php artisan migrate
+   docker-compose -f docker-compose.prod.yml up -d --build
    ```
 
-5. Access the application:
-   - Main application: http://localhost:8080
-   - Vite development server: http://localhost:5173
+## 🧰 Useful Commands
 
-### Local Development (Without Docker)
+```bash
+# Docker operations
+docker compose up -d            # Start containers
+docker compose down             # Stop containers
+docker compose logs -f          # View logs
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/shubhamku044/laravel-book-shelf.git
-   cd laravel-book-shelf
-   ```
+# Development tools
+composer test                   # Run tests
+npm run format                  # Format frontend code
+npm run lint                    # Lint frontend code
+```
 
-2. Install PHP dependencies:
-   ```bash
-   composer install
-   ```
-
-3. Install Node.js dependencies:
-   ```bash
-   npm install
-   ```
-
-4. Configure environment:
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   ```
-
-5. Set up the database:
-   ```bash
-   touch database/database.sqlite
-   chmod 666 database/database.sqlite  # Set proper write permissions
-   php artisan migrate
-   ```
-
-6. Start the development servers:
-   ```bash
-   # Single command to start both Laravel and Vite servers
-   composer run dev
-   ```
-
-## Development Commands
-
-- **Run tests (optional)**:
-  ```bash
-  composer test
-  ```
-
-- **Format frontend code (optional)**:
-  ```bash
-  npm run format
-  ```
-
-- **Lint frontend code (optional)**:
-  ```bash
-  npm run lint
-  ```
-
-## Docker Commands
-
-- **Start containers**:
-  ```bash
-  docker compose up -d
-  ```
-
-- **Stop containers**:
-  ```bash
-  docker compose down
-  ```
-
-- **View logs**:
-  ```bash
-  docker compose logs -f
-  ```
-
-## Project Structure
+## 📁 Project Structure
 
 - `app/` - Laravel application code
 - `resources/` - Frontend assets and React components
