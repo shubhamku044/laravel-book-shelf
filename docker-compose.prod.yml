@@ -5,7 +5,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: docker/app/Dockerfile
+      dockerfile: Dockerfile
     container_name: laravel-bookshelf-app
     restart: unless-stopped
     volumes:
