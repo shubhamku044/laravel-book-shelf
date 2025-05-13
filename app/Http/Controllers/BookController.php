@@ -27,9 +27,14 @@ class BookController extends Controller
             $sortBy = $validated['sort_by'] ?? 'created_at';
             $sortOrder = $validated['sort_order'] ?? 'desc';
 
-            $books = Book::orderBy($sortBy, $sortOrder)
-                ->paginate($perPage);
-            
+            if (in_array($sortBy, ['title', 'author'])) {
+                $books = Book::orderByRaw("LOWER({$sortBy}) {$sortOrder}")
+                    ->paginate($perPage);
+            } else {
+                $books = Book::orderBy($sortBy, $sortOrder)
+                    ->paginate($perPage);
+            }
+
             $meta = [
                 'current_page' => $books->currentPage(),
                 'per_page' => $books->perPage(),
@@ -80,12 +85,12 @@ class BookController extends Controller
                 'title.max' => 'The title may not be longer than 255 characters.',
                 'author.max' => 'The author name may not be longer than 255 characters.',
             ]);
-            
+
             // Check for duplicate book (same title and author)
             $existingBook = Book::where('title', $validated['title'])
                 ->where('author', $validated['author'])
                 ->first();
-                
+
             if ($existingBook) {
                 return response()->json([
                     'success' => false,
@@ -94,9 +99,9 @@ class BookController extends Controller
                     'isDuplicate' => true,
                 ], 422);
             }
-            
+
             $book = Book::create($validated);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Book created successfully.',
@@ -127,7 +132,7 @@ class BookController extends Controller
     {
         try {
             $book = Book::findOrFail($id);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Book retrieved successfully.',
@@ -167,10 +172,10 @@ class BookController extends Controller
                 'title.max' => 'The title may not be longer than 255 characters.',
                 'author.max' => 'The author name may not be longer than 255 characters.',
             ]);
-            
+
             $book = Book::findOrFail($id);
             $book->update($validated);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Book updated successfully.',
@@ -208,7 +213,7 @@ class BookController extends Controller
         try {
             $book = Book::findOrFail($id);
             $book->delete();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Book deleted successfully.',
