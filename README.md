@@ -2,6 +2,83 @@
 
 A modern web application built with Laravel, React, and Inertia.js for managing your personal book collection.
 
+## Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                                                                         │
+│                         Laravel Book Shelf                              │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                                                                         │
+│  ┌──────────────┐          ┌───────────────┐         ┌──────────────┐  │
+│  │              │          │               │         │              │  │
+│  │   Client     │◀────────▶│   Laravel     │◀────────▶│  Database    │  │
+│  │   Browser    │          │   Backend     │         │  (SQLite)    │  │
+│  │              │          │               │         │              │  │
+│  └──────────────┘          └───────────────┘         └──────────────┘  │
+│         │                          │                                    │
+│         │                          │                                    │
+│         ▼                          ▼                                    │
+│  ┌──────────────┐          ┌───────────────┐                           │
+│  │              │          │               │                           │
+│  │   React UI   │◀────────▶│   Inertia.js  │                           │
+│  │   Components │          │   Adapter     │                           │
+│  │              │          │               │                           │
+│  └──────────────┘          └───────────────┘                           │
+│         │                                                              │
+│         │                                                              │
+│         ▼                                                              │
+│  ┌──────────────────────────────────────────────┐                      │
+│  │                                              │                      │
+│  │              UI Components                   │                      │
+│  │  ┌────────────┐ ┌────────────┐ ┌──────────┐ │                      │
+│  │  │            │ │            │ │          │ │                      │
+│  │  │  Book List │ │ Add/Edit   │ │ Delete   │ │                      │
+│  │  │  Component │ │ Modal      │ │ Dialog   │ │                      │
+│  │  │            │ │            │ │          │ │                      │
+│  │  └────────────┘ └────────────┘ └──────────┘ │                      │
+│  │                                              │                      │
+│  └──────────────────────────────────────────────┘                      │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Architecture Explanation
+
+The Laravel Book Shelf application follows a modern single-page application architecture with server-side rendering capabilities. Here's a breakdown of each component:
+
+#### Backend Layer
+- **Laravel Backend**: Serves as the core application server, handling API requests, authentication, and business logic
+- **Database (SQLite)**: Stores book information, user data, and application state
+- **API Routes**: RESTful endpoints for CRUD operations on books
+
+#### Integration Layer
+- **Inertia.js**: Bridges the gap between Laravel and React, allowing server-side rendering while maintaining a SPA experience
+- **Data Flow**: Server-rendered initial page loads with client-side navigation for subsequent interactions
+
+#### Frontend Layer
+- **React Components**: Built with TypeScript for type safety and better developer experience
+- **UI Framework**: Uses Shadcn UI components built on Tailwind CSS for a consistent, responsive design
+- **State Management**: Local React state for component-level state, with Inertia handling page-level state
+
+#### Key UI Components
+- **Book List**: Displays all books with sorting and filtering capabilities
+- **Add/Edit Modal**: Form for creating new books or editing existing ones
+- **Delete Dialog**: Confirmation dialog for book deletion with toast notifications
+- **Toast Notifications**: Sonner-based toast system for user feedback
+- **404 Page**: Custom animated page for handling unknown routes
+
+#### Data Flow
+1. User interacts with the React UI
+2. Inertia.js handles client-side navigation and server requests
+3. Laravel processes requests and interacts with the SQLite database
+4. Response data is sent back to the client
+5. React updates the UI based on the new data
+
 ## Tech Stack
 
 - **Backend**: Laravel 12.x
@@ -18,30 +95,6 @@ A modern web application built with Laravel, React, and Inertia.js for managing 
 - Node.js 21.x (for local development)
 - PHP 8.2+ (for local development)
 - Composer (for local development)
-- AWS CLI (for AWS deployment)
-- GitHub Actions (for CI/CD)
-
-## AWS Deployment
-
-To deploy the application to AWS, you need to:
-
-1. Set up an AWS account and create an ECS cluster
-2. Create an ECR repository for your Docker images
-3. Add the following secrets to your GitHub repository:
-   - `AWS_ACCESS_KEY_ID` - Your AWS access key
-   - `AWS_SECRET_ACCESS_KEY` - Your AWS secret key
-   - `AWS_REGION` - Your AWS region (e.g., us-east-1)
-   - `AWS_ECS_CLUSTER` - Your ECS cluster name
-   - `AWS_ECS_SERVICE` - Your ECS service name
-   - `AWS_ECS_TASK_DEFINITION` - Your ECS task definition
-   - `AWS_ECS_CONTAINER_NAME` - Your ECS container name
-   - `SLACK_WEBHOOK_URL` (optional) - For Slack notifications
-   - `SLACK_CHANNEL` (optional) - For Slack notifications
-
-The deployment pipeline will automatically:
-- Build and push Docker images to ECR
-- Deploy to ECS
-- Send notifications to Slack (if configured)
 
 ## Prerequisites
 
@@ -57,7 +110,7 @@ The deployment pipeline will automatically:
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/shubhamku044/laravel-book-shelf.git
    cd laravel-book-shelf
    ```
 
@@ -87,7 +140,7 @@ The deployment pipeline will automatically:
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/shubhamku044/laravel-book-shelf.git
    cd laravel-book-shelf
    ```
 
@@ -182,15 +235,3 @@ The deployment pipeline will automatically:
 - `database/` - Database migrations and seeders
 - `tests/` - Application tests
 - `docker/` - Docker configuration files
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details. 
