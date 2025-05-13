@@ -3,49 +3,7 @@
 A modern web application built with Laravel, React, and Inertia.js for managing your personal book collection.
 
 ## Architecture Diagram
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                                                                         │
-│                         Laravel Book Shelf                              │
-│                                                                         │
-└─────────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                                                                         │
-│  ┌──────────────┐          ┌───────────────┐         ┌──────────────┐  │
-│  │              │          │               │         │              │  │
-│  │   Client     │◀────────▶│   Laravel     │◀────────▶│  Database    │  │
-│  │   Browser    │          │   Backend     │         │  (SQLite)    │  │
-│  │              │          │               │         │              │  │
-│  └──────────────┘          └───────────────┘         └──────────────┘  │
-│         │                          │                                    │
-│         │                          │                                    │
-│         ▼                          ▼                                    │
-│  ┌──────────────┐          ┌───────────────┐                           │
-│  │              │          │               │                           │
-│  │   React UI   │◀────────▶│   Inertia.js  │                           │
-│  │   Components │          │   Adapter     │                           │
-│  │              │          │               │                           │
-│  └──────────────┘          └───────────────┘                           │
-│         │                                                              │
-│         │                                                              │
-│         ▼                                                              │
-│  ┌──────────────────────────────────────────────┐                      │
-│  │                                              │                      │
-│  │              UI Components                   │                      │
-│  │  ┌────────────┐ ┌────────────┐ ┌──────────┐ │                      │
-│  │  │            │ │            │ │          │ │                      │
-│  │  │  Book List │ │ Add/Edit   │ │ Delete   │ │                      │
-│  │  │  Component │ │ Modal      │ │ Dialog   │ │                      │
-│  │  │            │ │            │ │          │ │                      │
-│  │  └────────────┘ └────────────┘ └──────────┘ │                      │
-│  │                                              │                      │
-│  └──────────────────────────────────────────────┘                      │
-│                                                                         │
-└─────────────────────────────────────────────────────────────────────────┘
-```
+![Architecture Diagram](image.png)
 
 ### Architecture Explanation
 
@@ -163,45 +121,30 @@ The Laravel Book Shelf application follows a modern single-page application arch
 5. Set up the database:
    ```bash
    touch database/database.sqlite
+   chmod 666 database/database.sqlite  # Set proper write permissions
    php artisan migrate
    ```
 
 6. Start the development servers:
    ```bash
-   # Terminal 1 - Laravel server
-   php artisan serve
-
-   # Terminal 2 - Vite development server
-   npm run dev
+   # Single command to start both Laravel and Vite servers
+   composer run dev
    ```
 
 ## Development Commands
 
-- **Start development servers**:
-  ```bash
-  composer dev
-  ```
-
-- **Run tests**:
+- **Run tests (optional)**:
   ```bash
   composer test
   ```
 
-- **Format code**:
+- **Format frontend code (optional)**:
   ```bash
-  # PHP
-  composer format
-
-  # JavaScript/TypeScript
   npm run format
   ```
 
-- **Lint code**:
+- **Lint frontend code (optional)**:
   ```bash
-  # PHP
-  composer lint
-
-  # JavaScript/TypeScript
   npm run lint
   ```
 
@@ -222,11 +165,6 @@ The Laravel Book Shelf application follows a modern single-page application arch
   docker compose logs -f
   ```
 
-- **Access container shell**:
-  ```bash
-  docker compose exec app sh
-  ```
-
 ## Project Structure
 
 - `app/` - Laravel application code
@@ -234,4 +172,3 @@ The Laravel Book Shelf application follows a modern single-page application arch
 - `routes/` - Application routes
 - `database/` - Database migrations and seeders
 - `tests/` - Application tests
-- `docker/` - Docker configuration files
